@@ -11,6 +11,6 @@ NOTE: This is an initial testing setup
 
 First run relay-server. Get the peer id of that from the logs.
 
-Next run txt-gen-node.
+Update config.json in ml-txt-gen-node with above peerid. Next run txt-gen-node.
 
-Next run user-node, this sends a Hello World message to txt-gen-node.
+Update config.json in user-node with above peerid. Next run user-node, this sends a Hello World message to txt-gen-node.
