@@ -16,7 +16,7 @@ Database is called `CloudComputing`. Right now ther is only one table called `Us
 
 ```bash
 export DB_PASSWORD=<db password>
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD --rm mysql
+docker run --name mysql -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD -p 3306:3306 --rm mysql
 
 cd browser
 docker build . -t browser 
