@@ -1,0 +1,29 @@
+version: '3'
+services:
+  browser:
+    container_name: browser
+    restart: always
+    build: ./browser
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - dev
+    depends_on:
+      - mysql
+  mysql:
+    container_name: mysql
+    restart: always
+    image: mysql
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - dev
+volumes:
+  mysql: # Docker will create the volume for you in the /var/lib/docker/volumes folder
+
+networks:
+  dev:

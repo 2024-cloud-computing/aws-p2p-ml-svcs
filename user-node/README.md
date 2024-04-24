@@ -10,21 +10,18 @@ sudo docker image rm -f user-node
 
 ## browser
 
-Database is called `CloudComputing`. Right now ther is only one table called `Users`.
+Database is called `CloudComputing`. Right now there is only one table called `Users`. The data is persisted under `/var/lib/docker/volumes/`
 
 ### Start
 
 ```bash
 export DB_PASSWORD=<db password>
-docker run --name mysql -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD -p 3306:3306 --rm mysql
-
-cd browser
-docker build . -t browser 
-docker run -p 3000:3000 -e DB_PASSWORD=$DB_PASSWORD --network=host browser
+docker-compose build
+docker-compose up
 ```
 
 ### Cleanup
 
 ```bash
-docker stop mysql
+docker-compose down
 ```
