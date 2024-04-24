@@ -45,7 +45,15 @@ async function startPeerNode() {
 
         node.on('peer:discovery', (peerId) => {
             console.log(`Peer ${myPeerId}, Discovered: ${peerId.toB58String()}`)
-        });
+        })
+
+        node.connectionManager.on('peer:connect', (connection) => {
+            console.log(`Peer ${myPeerId}, Connected: ${connection.remotePeer.toB58String()}`);
+        })
+
+        node.connectionManager.on('peer:disconnect', (connection) => {
+            console.log(`Peer ${myPeerId}, Disconnected: ${connection.remotePeer.toB58String()}`);
+        })
 
         await node.start()
 
