@@ -60,7 +60,6 @@ async function startPeerNode() {
         await node.pubsub.subscribe("TEST", (msg) => {
             console.log(`Received message on TEST: ${msg.data.toString()}`);
         });
-        
         console.log("Subscribed to TEST");
 
     } catch (e) {
