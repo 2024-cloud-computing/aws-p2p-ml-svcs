@@ -61,18 +61,6 @@ async function startPeerNode() {
             console.log(`Received message on TEST: ${msg.data.toString()}`);
         });
         
-        node.pubsub.on('sentiment_analysis_request', (msg) => {
-            console.log('message title: sentiment_analysis_request')
-            const queryMessageBody = P2PmessageToObject(msg);
-            console.log(queryMessageBody);
-            const responseMessageBody = {
-              type: 'sentiment_analysis_response',
-              queryId: queryMessageBody['queryId'],
-              from: myPeerId
-            }
-            node.pubsub.publish(queryMessageBody['from'], ObjectToP2Pmessage(responseMessageBody))
-          })
-          
         await node.pubsub.subscribe("sentiment_analysis_request");
         
         console.log("Subscribed to TEST");
