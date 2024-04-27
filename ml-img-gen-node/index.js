@@ -57,19 +57,19 @@ async function startPeerNode() {
         console.log("Subscribed to TEST");
 
         await node.pubsub.subscribe("image_generation_request", async (msg) => {
-            const messageText = msg.data.toString();
-            const senderPeerId = msg.from;
-            console.log(`Received an image generation request: ${messageText}`);
-    
-            // const summarizedText = await summarizeText(messageText); // This is your ML summarization logic function
-            const imageResponse = await imageGeneration();
-            await node.pubsub.publish(senderPeerId, Buffer.from(imageResponse));
-            console.log(`The image has been successfully generated and the response was sent back to ${senderPeerId}`);
-        });
-        console.log("Subscribed to image_generation");
+            const { imgInput, from, queryId, type } = msg;
 
-    } catch (e) {
-        console.log(e)
+            console.log(`Received an image generation request: ${msg}`);
+    
+            const imageResponse = await imageGeneration(imgInput);
+            await node.pubsub.publish(from, Buffer.from(imageResponse));
+
+            console.log(`${type} (Query ID: '${queryId}') has been successfully processed and the response was sent back to '${from}'`);
+        });
+
+        console.log("Subscribed to image_generation");
+    } catch (err) {
+        console.log(err)
     }
 }
 

@@ -28,8 +28,9 @@ async function imageGeneration(imageDescription = 'Computer Science Student at N
     }
   };
 
+  const fileName = `output_image_${Date.now()}.png`
+
   const req = https.request(options, (res) => {
-    const fileName = `output_image_${Date.now()}.png`
     const file = fs.createWriteStream(fileName);
     res.pipe(file);
   });
@@ -40,6 +41,11 @@ async function imageGeneration(imageDescription = 'Computer Science Student at N
 
   req.write(data);
   req.end();
+
+  return {
+    // the Lepton AI features one image per request
+    data: [{ Image: `${process.env.PWD}/${fileName}` }]
+  }
 }
 
 module.exports = imageGeneration;
