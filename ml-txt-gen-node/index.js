@@ -61,8 +61,6 @@ async function startPeerNode() {
             console.log(`Received message on TEST: ${msg.data.toString()}`);
         });
         
-        await node.pubsub.subscribe("sentiment_analysis_request");
-        
         console.log("Subscribed to TEST");
 
     } catch (e) {
