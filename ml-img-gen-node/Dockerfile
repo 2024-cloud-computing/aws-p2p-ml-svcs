@@ -1,12 +1,14 @@
-FROM python:3.10-slim
+FROM node:alpine
+
+RUN apk add build-base
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY package.json .
+RUN npm install
 
-COPY . .
+COPY index.js imageGeneration.js config.json /app/
 
-EXPOSE 3000
+EXPOSE 2030
 
-ENTRYPOINT ["python", "main.py"]
+CMD ["npm", "start"]
