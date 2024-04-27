@@ -45,15 +45,7 @@ async function startPeerNode() {
 
         node.on('peer:discovery', (peerId) => {
             console.log(`Peer ${myPeerId}, Discovered: ${peerId.toB58String()}`)
-        })
-
-        node.connectionManager.on('peer:connect', (connection) => {
-            console.log(`Peer ${myPeerId}, Connected: ${connection.remotePeer.toB58String()}`);
-        })
-
-        node.connectionManager.on('peer:disconnect', (connection) => {
-            console.log(`Peer ${myPeerId}, Disconnected: ${connection.remotePeer.toB58String()}`);
-        })
+        });
 
         await node.start()
 
@@ -61,6 +53,20 @@ async function startPeerNode() {
         setTimeout(() => {
             node.pubsub.publish("TEST", Buffer.from(`HELLO WORLD from ${myPeerId}!`));
             console.log("Message published on TEST");
+        }, 5000);
+
+
+        // Subscribe to its own peer ID to receive summarization responses
+        await node.pubsub.subscribe(myPeerId, (msg) => {
+            const summarizedText = msg.data.toString();
+            console.log(`Received Sentiment Metrics : ${summarizedText}`);
+        });
+
+        // Send a summarization request after a delay
+        setTimeout(() => {
+            const textToSummarize = "I am very happy to be here";
+            node.pubsub.publish("sentiment_analysis_request", Buffer.from(textToSummarize));
+            console.log("Sentiment Ananlysis request sent");
         }, 5000);
 
     } catch (e) {
