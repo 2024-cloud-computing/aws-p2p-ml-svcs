@@ -5,7 +5,7 @@ const fs = require('fs');
 // replace it with your key if necessary
 const LEPTON_API_TOKEN = 'oq904ib3oak3cn638n27592jmhgk7y6s'
 
-async function imageGeneration(imageDescription = 'Computer Science Student at New York University') {
+async function imageGeneration(imageDescription) {
   const data = JSON.stringify({
     width: 1024,
     height: 1024,
@@ -29,23 +29,26 @@ async function imageGeneration(imageDescription = 'Computer Science Student at N
   };
 
   const fileName = `output_image_${Date.now()}.png`
+  const filePath = `${__dirname}/${fileName}`;
 
-  const req = https.request(options, (res) => {
-    const file = fs.createWriteStream(fileName);
-    res.pipe(file);
-  });
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, (res) => {
+      const file = fs.createWriteStream(filePath);
+      res.pipe(file);
 
-  req.on('error', (error) => {
-    console.error(error);
-  });
+      res.on('end', function() {
+        resolve({data: [{ Image: filePath }]})
+      })
+    });
 
-  req.write(data);
-  req.end();
+    req.on('error', (error) => {
+      console.error(error);
+      reject(error);
+    });
 
-  return {
-    // the Lepton AI features one image per request
-    data: [{ Image: `${process.env.PWD}/${fileName}` }]
-  }
+    req.write(data);
+    req.end();
+  })
 }
 
 module.exports = imageGeneration;

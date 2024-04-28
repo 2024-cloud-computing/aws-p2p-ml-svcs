@@ -14,7 +14,7 @@ const bootstrapMultiaddrs = config['bootstrapMultiaddrs']
 const imageGeneration = require('./imageGeneration');
 
 async function createPeerNode() {
-    return await Libp2p.create({
+    const node = await Libp2p.create({
         addresses: {
             listen: ['/ip4/0.0.0.0/tcp/2030']
         },
@@ -38,12 +38,14 @@ async function createPeerNode() {
           }
         }
     })
+
+    return node;
 }
 
 async function startPeerNode() {
     try{
         node = await createPeerNode()
-        myPeerId = node.peerId.toB58String()
+        const myPeerId = node.peerId.toB58String()
 
         node.on('peer:discovery', (peerId) => {
             console.log(`Peer ${myPeerId}, Discovered: ${peerId.toB58String()}`)
@@ -59,10 +61,12 @@ async function startPeerNode() {
         await node.pubsub.subscribe("image_generation_request", async (msg) => {
             const { imgInput, from, queryId, type } = msg;
 
-            console.log(`Received an image generation request: ${msg}`);
+            console.log(`Received an image generation request: ${JSON.stringify(msg)}`);
     
-            const imageResponse = await imageGeneration(imgInput);
-            await node.pubsub.publish(from, Buffer.from(imageResponse));
+            const imageResult = await imageGeneration(imgInput);
+            const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
+
+            await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
 
             console.log(`${type} (Query ID: '${queryId}') has been successfully processed and the response was sent back to '${from}'`);
         });
