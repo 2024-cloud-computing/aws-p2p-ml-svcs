@@ -2,8 +2,9 @@
 const https = require('https');
 const fs = require('fs');
 
-// replace it with your key if necessary
-const LEPTON_API_TOKEN = 'oq904ib3oak3cn638n27592jmhgk7y6s'
+require('dotenv').config()
+
+const { LEPTON_API_TOKEN } = process.env;
 
 async function imageGeneration(imageDescription) {
   const data = JSON.stringify({

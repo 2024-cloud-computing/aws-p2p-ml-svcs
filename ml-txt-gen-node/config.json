@@ -1,6 +1,3 @@
 {
-    "bootstrapMultiaddrs": [
-        "/ip4/127.0.0.1/tcp/2024/p2p/QmUyAaRiibYYB42LzvTdjuV4xZfttdJjiew1Wz6NDT3riR",
-        "/ip4/127.0.0.1/tcp/2024/p2p/QmXxN1JU4NzksYEwAP6yg8YkVoS6zsoeT77BXn3PXLTvhE"
-    ]
+    "bootstrapMultiaddrs": ["/ip4/127.0.0.1/tcp/2024/p2p/QmXxN1JU4NzksYEwAP6yg8YkVoS6zsoeT77BXn3PXLTvhE"]
 }
