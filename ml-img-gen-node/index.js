@@ -51,6 +51,18 @@ async function startPeerNode() {
             console.log(`Peer ${myPeerId}, Discovered: ${peerId.toB58String()}`)
         })
 
+        node.pubsub.on('img_gen_query', (msg) => {
+            console.log('message title: img_gen_query')
+            const queryMessageBody = JSON.parse(uint8ArrayToString(msg.data))
+            console.log(queryMessageBody);
+            const responseMessageBody = {
+                type: 'img_gen_query',
+                queryId: queryMessageBody['queryId'],
+                from: myPeerId
+            }
+            node.pubsub.publish(queryMessageBody['from'], uint8ArrayFromString(JSON.stringify(responseMessageBody)))
+        });
+
         await node.start()
         
         await node.pubsub.subscribe("TEST", (msg) => {
@@ -58,18 +70,20 @@ async function startPeerNode() {
         });
         console.log("Subscribed to TEST");
 
-        await node.pubsub.subscribe("image_generation_request", async (msg) => {
+        node.pubsub.on(myPeerId, async (msg) => {
             const { imgInput, from, queryId, type } = msg;
 
             console.log(`Received an image generation request: ${JSON.stringify(msg)}`);
     
-            const imageResult = await imageGeneration(imgInput);
-            const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
+            if (type == 'img_gen_query') {
+                const imageResult = await imageGeneration(imgInput);
+                const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
 
-            await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
+                await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
 
-            console.log(`${type} (Query ID: '${queryId}') has been successfully processed and the response was sent back to '${from}'`);
-        });
+                console.log(`${type} (Query ID: '${queryId}') has been successfully processed and the response was sent back to '${from}'`);
+            }
+        })
 
         console.log("Subscribed to image_generation");
     } catch (err) {
