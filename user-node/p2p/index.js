@@ -10,6 +10,7 @@ const uint8ArrayFromString = require('uint8arrays/from-string')
 
 const config = require('./config.json')
 const bootstrapMultiaddrs = process.env.RELAY_URL ? [process.env.RELAY_URL] : config.bootstrapMultiaddrs
+const testing = process.env.TESTING ? process.env.TESTING : "false"
 
 // express for frontend communication
 const express = require('express');
@@ -172,30 +173,32 @@ async function startServer() {
       
       queryMessageBody['type'] = 'txt_gen_query';
       console.log(queryMessageBody);
-      /*
-      // Record the query in the queryMap
-      queryMap.set(queryId, queryMessageBody);
       
-      // Send p2p message
-      node.pubsub.publish('txt_gen_query', ObjectToP2Pmessage(queryMessageBody));
-  
-      // Wait for response
-      var txtAnalysis;
-      await ensureResponseArrives(queryId, 1000000).then(function () {
-        txtAnalysis = responseMap.get(queryId);
-        responseMap.delete(queryId);
-      });
-      */
-      
-      txtAnalysis = {
-        "data": [
-            {
-                "Input": "I am a good person",
-                "Label": "Positive",
-                "Score": 0.9
-            }
-        ]
+      if (testing == "true"){
+        txtAnalysis = {
+          "data": [
+              {
+                  "Input": "I am a good person",
+                  "Label": "Positive",
+                  "Score": 0.9
+              }
+          ]
+        }
+      } else{
+        // Record the query in the queryMap
+        queryMap.set(queryId, queryMessageBody);
+        
+        // Send p2p message
+        node.pubsub.publish('txt_gen_query', ObjectToP2Pmessage(queryMessageBody));
+    
+        // Wait for response
+        var txtAnalysis;
+        await ensureResponseArrives(queryId, 1000000).then(function () {
+          txtAnalysis = responseMap.get(queryId);
+          responseMap.delete(queryId);
+        });
       }
+     
       res.status(200).send(txtAnalysis);
     });
   
@@ -209,21 +212,9 @@ async function startServer() {
         queryMessageBody['type'] = 'img_gen_query';
         console.log(queryMessageBody);
         
-        /*
-        // Record the query in the queryMap
-        queryMap.set(queryId, queryMessageBody);
-        
-        // Send p2p message
-        node.pubsub.publish('img_gen_query', ObjectToP2Pmessage(queryMessageBody));
-    
-        // Wait for response
         var imgGen;
-        await ensureResponseArrives(queryId, 1000000).then(function () {
-            imgGen = responseMap.get(queryId);
-          responseMap.delete(queryId);
-        });
-        */
-        imgGen = {
+        if (testing == "true"){
+          imgGen = {
             "data": [
                 {
                     "Image": "https://www.w3schools.com/w3images/fjords.jpg"
@@ -235,6 +226,20 @@ async function startServer() {
                     "Image": "https://www.w3schools.com/w3images/nature.jpg"
                 }
             ]
+          }
+        } else{
+          // Record the query in the queryMap
+          queryMap.set(queryId, queryMessageBody);
+          
+          // Send p2p message
+          node.pubsub.publish('img_gen_query', ObjectToP2Pmessage(queryMessageBody));
+      
+          // Wait for response
+          var imgGen;
+          await ensureResponseArrives(queryId, 1000000).then(function () {
+              imgGen = responseMap.get(queryId);
+            responseMap.delete(queryId);
+          });
         }
         res.status(200).send(imgGen);
     });

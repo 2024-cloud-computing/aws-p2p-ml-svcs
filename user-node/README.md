@@ -138,6 +138,7 @@ make sure you have the relay server"s address at hand, e.g., `/ip4/127.0.0.1/tcp
 export RELAY_SERVER=<relay server address>
 export DB_PASSWORD=<db password>
 export DB_HOST=<db host> #if running locally, then set this to `localhost`
+export TESTING=false # `false` if using service nodes, `true` if using mock data
 docker-compose build
 docker-compose up
 ```
