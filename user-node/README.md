@@ -1,27 +1,51 @@
 # user-node
+[TOC]
 ## p2p
 
 Contains the backend code implemented with `libp2p` and `express.js` to make requests and receive responses through p2p network.
 
-### P2P Data Payload
+### Dataflow explaination
+The following diagram from TreasureBox illustrates how the request and response should be handled in a P2P connection. It is something similar to a three-way handshake where the user sends a query to see if any service node is available, then upon receiving a hit acknowledgment from a service node, the user sends the actual request, and lastly, the service node sends back a response. Hence, every service node should be able to handle two kinds of requests.
+
+![](https://raw.githubusercontent.com/yuhanzz/TreasureBox/master/images/image5.png)
 
 #### ML Text Svc
 
-`txt_gen_query`
-```json
+`txt_gen_query`: user -> service
+```
 {
     txtInput: "This is a text input that will be analyzed by the sentiment analysis svc",
-    from: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD",
-    queryId: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD-1714249400169-0",
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
     type: "txt_gen_query"
 }
 ```
 
-`txt_gen_response`
-```json
+`txt_gen_query_hit`: service -> user
+```
 {
-    from: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD",
-    queryId: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD-1714249400169-0",
+    txtInput: "This is a text input that will be analyzed by the sentiment analysis svc",
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
+    type: "txt_gen_query_hit"
+}
+```
+
+`txt_gen_request`:  user -> service
+```
+{
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
+    type: "txt_gen_request",
+    txtInput: "This is a text input that will be analyzed by the sentiment analysis svc"
+}
+```
+
+`txt_gen_response`:  service -> user
+```
+{
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
     type: "txt_gen_response"
     data: [
             {
@@ -35,22 +59,42 @@ Contains the backend code implemented with `libp2p` and `express.js` to make req
 
 #### ML Image Svc
 
-`img_gen_query`
-```json
+`img_gen_query`: user -> service
+```
 {
     imgInput: "This is a image description based on which the image generation svc will use",
-    from: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD",
-    queryId: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD-1714249400169-0",
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
     type: "img_gen_query"
 }
 ```
 
-`img_gen_response`
-
-```json
+`img_gen_query_hit`: service -> user
+```
 {
-    from: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD",
-    queryId: "QmXpEfNw98FLZrSbR5xPphPFuBrtGrdkUnYoJhXG1FBosD-1714249400169-0",
+    imgInput: "This is a image description based on which the image generation svc will use",
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
+    type: "img_gen_query_hit"
+}
+```
+
+`img_gen_request`:  user -> service
+```
+{
+    imgInput: "This is a image description based on which the image generation svc will use",
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
+    type: "img_gen_request"
+}
+```
+
+`img_gen_response`: service -> user
+
+```
+{
+    from: <peerId>,
+    queryId: <queryId-genereated-by-user>,
     type: "img_gen_response"
     data: [
         {
@@ -63,6 +107,7 @@ Contains the backend code implemented with `libp2p` and `express.js` to make req
     ]
 }
 ```
+
 
 ## browser
 
