@@ -5,6 +5,8 @@ const MPLEX = require('libp2p-mplex')
 const { NOISE } = require('libp2p-noise')
 const PubsubPeerDiscovery = require('libp2p-pubsub-peer-discovery')
 const TCP = require('libp2p-tcp')
+const uint8ArrayFromString = require('uint8arrays/from-string')
+
 
 const config = require('./config.json')
 const bootstrapMultiaddrs = process.env.RELAY_URL ? [process.env.RELAY_URL] : config.bootstrapMultiaddrs
@@ -18,6 +20,15 @@ var myPeerId;
 var queryMap = new Map();
 var responseMap = new Map();
 
+
+// Helper functions
+function P2PmessageToObject(message) {
+  return JSON.parse(uint8ArrayToString(message.data))
+}
+
+function ObjectToP2Pmessage(message) {
+  return uint8ArrayFromString(JSON.stringify(message));
+}
 
 async function createPeerNode() {
     const node = await Libp2p.create({
@@ -97,7 +108,11 @@ function handleHit(messageBody) {
     const messageQueryId = messageBody['queryId'];
     if (queryMap.has(messageQueryId)) {
       const providerPeerId = messageBody['from'];
-      const requestMessageBody = queryMap.get(messageQueryId);
+      var requestMessageBody = queryMap.get(messageQueryId);
+      if (messageBody['type'] == 'txt_gen_query_hit')
+        requestMessageBody['type'] = 'txt_gen_request';
+      else if (messageBody['type'] == 'img_gen_query_hit')
+        requestMessageBody['type'] = 'img_gen_request';
       node.pubsub.publish(providerPeerId, ObjectToP2Pmessage(requestMessageBody));
       queryMap.delete(messageQueryId);
     }
@@ -155,12 +170,11 @@ async function startServer() {
       queryMessageBody['from'] = myPeerId;
       queryMessageBody['queryId'] = queryId;
       
-      var requestMessageBody = queryMessageBody;
-      requestMessageBody['type'] = 'txt_gen_query';
-      console.log(requestMessageBody);
+      queryMessageBody['type'] = 'txt_gen_query';
+      console.log(queryMessageBody);
       /*
       // Record the query in the queryMap
-      queryMap.set(queryId, requestMessageBody);
+      queryMap.set(queryId, queryMessageBody);
       
       // Send p2p message
       node.pubsub.publish('txt_gen_query', ObjectToP2Pmessage(queryMessageBody));
@@ -192,13 +206,12 @@ async function startServer() {
         queryMessageBody['from'] = myPeerId;
         queryMessageBody['queryId'] = queryId;
         
-        var requestMessageBody = queryMessageBody;
-        requestMessageBody['type'] = 'img_gen_query';
-        console.log(requestMessageBody);
+        queryMessageBody['type'] = 'img_gen_query';
+        console.log(queryMessageBody);
         
         /*
         // Record the query in the queryMap
-        queryMap.set(queryId, requestMessageBody);
+        queryMap.set(queryId, queryMessageBody);
         
         // Send p2p message
         node.pubsub.publish('img_gen_query', ObjectToP2Pmessage(queryMessageBody));
