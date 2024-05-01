@@ -6,22 +6,34 @@ services:
     build: ./browser
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
-    networks:
-      - dev
+      DB_HOST: ${DB_HOST}
+    network_mode: "host"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+  p2p:
+    container_name: p2p
+    restart: always
+    build: ./p2p
+    environment:
+      RELAY_URL: ${RELAY_URL}
+    network_mode: "host"
+    depends_on:
+      - browser
   mysql:
     container_name: mysql
     restart: always
     image: mysql
     environment:
-      DB_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     volumes:
       - mysql:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - dev
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    network_mode: "host"
+
 volumes:
   mysql: # Docker will create the volume for you in the /var/lib/docker/volumes folder
 
