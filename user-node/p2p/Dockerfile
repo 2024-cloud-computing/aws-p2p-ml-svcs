@@ -9,6 +9,6 @@ RUN npm install
 
 COPY index.js config.json /app/
 
-EXPOSE 2025
+EXPOSE 2025 8080
 
 CMD ["npm", "start"]
