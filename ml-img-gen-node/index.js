@@ -71,23 +71,27 @@ async function startPeerNode() {
         console.log("Subscribed to TEST");
 
         node.pubsub.on(myPeerId, async (msg) => {
-            const { imgInput, from, queryId, type } = msg;
-
-            console.log(`Received an image generation request: ${JSON.stringify(msg)}`);
+            const { type, from, queryId } = msg;
     
             if (type == 'img_gen_query') {
+                console.log(`Received an image generation request: ${JSON.stringify(msg)}`);
+
+                const { imgInput } = msg;
+
+                let imageResult; 
+                let imageGenResponse = { type: "img_gen_response", from, queryId }
+
                 try {
-                    const imageResult = await imageGeneration(imgInput);
-                    const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
-
-                    await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
-
+                    imageResult = await imageGeneration(imgInput);
                     console.log(`${type} (Query ID: '${queryId}') has been successfully processed and the response was sent back to '${from}'`);
                 } catch (err) {
-                    const imageResult = {data: [{ Image: `${__dirname}/sample_output_image.png` }]};
-                    const mockData = { ...imageResult, type: "img_gen_response", from, queryId }
-                    await node.pubsub.publish(from, Buffer.from(JSON.stringify(mockData)));
+                    imageResult = { data: [{ Image: `${__dirname}/sample_output_image.png` }] };
+
                     console.log(`[Error] ${JSON.stringify(err)}`)
+                    console.log(`${type} (Query ID: '${queryId}') has been failed to process, so the mock data was sent back to '${from}'`);
+                } finally {
+                    imageGenResponse = { ...imageResult, ...imageGenResponse }
+                    await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageGenResponse)));
                 }
             }
         })
