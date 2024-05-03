@@ -36,6 +36,3 @@ services:
 
 volumes:
   mysql: # Docker will create the volume for you in the /var/lib/docker/volumes folder
-
-networks:
-  dev:

@@ -111,7 +111,11 @@ The following diagram from TreasureBox illustrates how the request and response 
 
 ## browser
 
-Contain the frontend code implemented with `flask` to authenticate users against a MySQL database. The database is named `CloudComputing` that has one table called `Users` with the following schema:
+Contain the frontend code implemented with `flask` to authenticate users against a MySQL database. 
+
+## mysql
+
+Contain the terraform scripts for a MySQL server istance on AWS RDS. The database is named `CloudComputing` that has one table called `Users` with the following schema:
 
 ```sql
 #Users
@@ -121,30 +125,45 @@ firstname VARCHAR(200),
 lastname VARCHAR(200)
 ```
 
-## mysql
-
-### local setup
-The data is persisted under `/var/lib/docker/volumes/`
-
-### remote setup
-
-TBD
-
-## Start
+## Deploy
 
 make sure you have the relay server"s address at hand, e.g., `/ip4/127.0.0.1/tcp/2024/p2p/QmQLuEX6ELbNscTSUM5wj4y7Cb1nxJwC46xAkzKSG9zxqj`.
 
 ```bash
 export RELAY_SERVER=<relay server address>
-export DB_PASSWORD=<db password>
-export DB_HOST=<db host> #if running locally, then set this to `localhost`
 export TESTING=false # `false` if using service nodes, `true` if using mock data
-docker-compose build
-docker-compose up
 ```
 
-## Cleanup
+### Option1: local mysql
+The data is persisted under `/var/lib/docker/volumes/`
 
 ```bash
-docker-compose down
+export DB_PASSWORD=<db password>
+export DB_HOST=localhost
+docker-compose -f docker-compose-local.yml build
+docker-compose -f docker-compose-local.yml up
+```
+
+clean up
+```bash
+docker-compose -f docker-compose-local.yml down
+```
+
+### Option2: remote mysql (via Terraform)
+
+```bash
+export TF_VAR_DB_PASSWORD=<db password>
+cd mysql
+terraform init
+terraform apply --auto-approve
+export DB_HOST=$(terraform output db_instance_address)
+cd ..
+docker-compose -f docker-compose-remote.yml build
+docker-compose -f docker-compose-remote.yml up
+```
+
+clean up
+```bash
+docker-compose -f docker-compose-remote.yml down
+terraform destroy --auto-approve
 ```

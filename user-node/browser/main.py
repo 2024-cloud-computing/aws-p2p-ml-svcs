@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from flask_cors import CORS, cross_origin
+import bcrypt
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -28,8 +29,9 @@ def insert():
         password = request.form['password']
         firstname = request.form['firstname']
         lastname = request.form['lastname']
+        hashed = bcrypt.hashpw(str.encode(password), bcrypt.gensalt( 12 ))
         if db.check_user(username):
-            db.insert_user(username, password, firstname, lastname)
+            db.insert_user(username, hashed, firstname, lastname)
         else:
             return render_template("loginfail.html")
         return render_template("mainpage.html", username=username)
