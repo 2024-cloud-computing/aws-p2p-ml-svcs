@@ -151,6 +151,8 @@ docker-compose -f docker-compose-local.yml down
 
 ### Option2: remote mysql (via Terraform)
 
+Install terraform CLI and make sure AWS profile is set locally [doc](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#shared-configuration-and-credentials-files)
+
 ```bash
 export TF_VAR_DB_PASSWORD=<db password>
 cd mysql
