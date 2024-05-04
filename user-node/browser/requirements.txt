@@ -2,4 +2,3 @@ flask
 pymysql
 cryptography
 flask_cors
-bcrypt
