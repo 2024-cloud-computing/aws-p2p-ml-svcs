@@ -4,7 +4,7 @@ import os
 class MySQLConn:
     def __init__(self):
         self.user = "root"
-        self.host = os.environ.get('DB_HOST', "mysql")
+        self.host = os.environ.get('DB_HOST', "localhost")
         self.password = os.environ.get('DB_PASSWORD', "")
         self.conn = pymysql.connect(
             host=self.host,

@@ -1,0 +1,19 @@
+version: '3'
+services:
+  browser:
+    container_name: browser
+    restart: always
+    build: ./browser
+    environment:
+      DB_PASSWORD: ${TF_VAR_DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+    network_mode: "host"
+  p2p:
+    container_name: p2p
+    restart: always
+    build: ./p2p
+    environment:
+      RELAY_URL: ${RELAY_URL}
+    network_mode: "host"
+    depends_on:
+      - browser
