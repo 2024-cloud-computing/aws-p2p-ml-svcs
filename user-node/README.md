@@ -1,10 +1,13 @@
 # user-node
+
 [TOC]
+
 ## p2p
 
 Contains the backend code implemented with `libp2p` and `express.js` to make requests and receive responses through p2p network.
 
 ### Dataflow explaination
+
 The following diagram from TreasureBox illustrates how the request and response should be handled in a P2P connection. It is something similar to a three-way handshake where the user sends a query to see if any service node is available, then upon receiving a hit acknowledgment from a service node, the user sends the actual request, and lastly, the service node sends back a response. Hence, every service node should be able to handle two kinds of requests.
 
 ![](https://raw.githubusercontent.com/yuhanzz/TreasureBox/master/images/image5.png)
@@ -12,6 +15,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 #### ML Text Svc
 
 `txt_gen_query`: user -> service
+
 ```
 {
     txtInput: "This is a text input that will be analyzed by the sentiment analysis svc",
@@ -22,6 +26,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 ```
 
 `txt_gen_query_hit`: service -> user
+
 ```
 {
     txtInput: "This is a text input that will be analyzed by the sentiment analysis svc",
@@ -32,6 +37,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 ```
 
 `txt_gen_request`:  user -> service
+
 ```
 {
     from: <peerId>,
@@ -42,6 +48,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 ```
 
 `txt_gen_response`:  service -> user
+
 ```
 {
     from: <peerId>,
@@ -60,6 +67,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 #### ML Image Svc
 
 `img_gen_query`: user -> service
+
 ```
 {
     imgInput: "This is a image description based on which the image generation svc will use",
@@ -70,6 +78,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 ```
 
 `img_gen_query_hit`: service -> user
+
 ```
 {
     imgInput: "This is a image description based on which the image generation svc will use",
@@ -80,6 +89,7 @@ The following diagram from TreasureBox illustrates how the request and response 
 ```
 
 `img_gen_request`:  user -> service
+
 ```
 {
     imgInput: "This is a image description based on which the image generation svc will use",
@@ -108,10 +118,9 @@ The following diagram from TreasureBox illustrates how the request and response 
 }
 ```
 
-
 ## browser
 
-Contain the frontend code implemented with `flask` to authenticate users against a MySQL database. 
+Contain the frontend code implemented with `flask` to authenticate users against a MySQL database.
 
 ## mysql
 
@@ -135,18 +144,19 @@ export TESTING=false # `false` if using service nodes, `true` if using mock data
 ```
 
 ### Option1: local mysql
-The data is persisted under `/var/lib/docker/volumes/`
+
+The data is persisted under `/var/lib/docker/volumes/`. **If you are changing `DB_PASSWORD`, please remove the volume by running cleanup command before starting again.**
 
 ```bash
 export DB_PASSWORD=<db password>
-export DB_HOST=localhost
 docker-compose -f docker-compose-local.yml build
 docker-compose -f docker-compose-local.yml up
 ```
 
 clean up
+
 ```bash
-docker-compose -f docker-compose-local.yml down
+docker-compose -f docker-compose-local.yml down -v
 ```
 
 ### Option2: remote mysql (via Terraform)
@@ -165,6 +175,7 @@ docker-compose -f docker-compose-remote.yml up
 ```
 
 clean up
+
 ```bash
 docker-compose -f docker-compose-remote.yml down
 terraform destroy --auto-approve
