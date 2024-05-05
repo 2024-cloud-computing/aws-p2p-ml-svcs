@@ -52,7 +52,7 @@ async function startPeerNode() {
         })
 
         node.pubsub.on('img_gen_query', (msg) => {
-            console.log('message title: img_gen_query_hit')
+            console.log('message title: img_gen_query')
             const queryMessageBody = JSON.parse(uint8ArrayToString(msg.data))
             console.log(queryMessageBody);
             const responseMessageBody = {

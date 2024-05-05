@@ -235,7 +235,6 @@ async function startServer() {
           node.pubsub.publish('img_gen_query', ObjectToP2Pmessage(queryMessageBody));
       
           // Wait for response
-          var imgGen;
           await ensureResponseArrives(queryId, 1000000).then(function () {
               imgGen = responseMap.get(queryId);
             responseMap.delete(queryId);

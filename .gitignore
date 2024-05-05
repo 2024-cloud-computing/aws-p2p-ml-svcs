@@ -142,4 +142,4 @@ output_image_*.png
 .terraform/
 deployer-key*
 .terraform.lock*
-terraform.tfstate
+terraform.tfstate*
