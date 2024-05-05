@@ -137,3 +137,9 @@ __pycache__/
 
 # Outcome of image generation
 output_image_*.png
+
+# Terraform build output
+.terraform/
+deployer-key*
+.terraform.lock*
+terraform.tfstate
