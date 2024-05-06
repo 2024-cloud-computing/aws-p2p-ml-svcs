@@ -28,8 +28,9 @@ def insert():
         password = request.form['password']
         firstname = request.form['firstname']
         lastname = request.form['lastname']
+        hashed = str(hash(password))
         if db.check_user(username):
-            db.insert_user(username, password, firstname, lastname)
+            db.insert_user(username, hashed, firstname, lastname)
         else:
             return render_template("loginfail.html")
         return render_template("mainpage.html", username=username)
@@ -40,7 +41,8 @@ def checkuser():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if db.auth_user(username, password):
+        hashed = str(hash(password))
+        if db.auth_user(username, hashed):
             return render_template("mainpage.html", username=username)
         else:
             return render_template("loginfail.html")

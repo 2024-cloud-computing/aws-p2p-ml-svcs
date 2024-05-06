@@ -132,14 +132,6 @@ dist
 .DS_Store
 */**/.DS_Store
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-
-# Outcome of image generation
-output_image_*.png
-
-# Terraform build output
-.terraform/
-deployer-key*
-.terraform.lock*
-terraform.tfstate*
+.terraform*
+terraform.tfstate
+terraform.tfstate.backup
