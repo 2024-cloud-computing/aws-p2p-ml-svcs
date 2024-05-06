@@ -135,3 +135,9 @@ dist
 .terraform*
 terraform.tfstate
 terraform.tfstate.backup
+
+# image generated my ml-img-gen-node
+output_image*.png
+
+# Pycache by user-node/browser
+__pycache__/
