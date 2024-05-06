@@ -7,7 +7,8 @@ WORKDIR /app
 COPY package.json .
 RUN npm install
 
-COPY index.js imageGeneration.js config.json /app/
+# sample_output_image is mockdata in case the request is failed
+COPY index.js imageGeneration.js sample_output_image.png config.json /app/
 
 EXPOSE 2030
 

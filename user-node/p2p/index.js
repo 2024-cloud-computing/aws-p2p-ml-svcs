@@ -6,6 +6,7 @@ const { NOISE } = require('libp2p-noise')
 const PubsubPeerDiscovery = require('libp2p-pubsub-peer-discovery')
 const TCP = require('libp2p-tcp')
 const uint8ArrayFromString = require('uint8arrays/from-string')
+const uint8ArrayToString = require('uint8arrays/to-string')
 
 
 const config = require('./config.json')

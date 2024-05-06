@@ -9,9 +9,14 @@ const TCP = require('libp2p-tcp')
 
 const config = require('./config.json')
 const bootstrapMultiaddrs = config['bootstrapMultiaddrs']
+const uint8ArrayToString = require('uint8arrays/to-string')
 
 // Image generation
 const imageGeneration = require('./imageGeneration');
+
+function P2PmessageToObject(message) {
+    return JSON.parse(uint8ArrayToString(message.data))
+}
 
 async function createPeerNode() {
     const node = await Libp2p.create({
@@ -51,51 +56,39 @@ async function startPeerNode() {
             console.log(`Peer ${myPeerId}, Discovered: ${peerId.toB58String()}`)
         })
 
-        node.pubsub.on('img_gen_query', (msg) => {
+        node.pubsub.on('img_gen_query', async (msg) => {
             console.log('message title: img_gen_query')
-            const queryMessageBody = JSON.parse(uint8ArrayToString(msg.data))
-            console.log(queryMessageBody);
-            const responseMessageBody = {
-                type: 'img_gen_query_hit',
-                queryId: queryMessageBody['queryId'],
-                from: myPeerId
-            }
-            node.pubsub.publish(queryMessageBody['from'], uint8ArrayFromString(JSON.stringify(responseMessageBody)))
-        });
 
-        await node.start()
+            const { imgInput, from, queryId, type } = P2PmessageToObject(msg);
+    
+            try {
+                const imageResult = await imageGeneration(imgInput);
+                const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
+
+                await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
+
+                console.log(`img_gen_request has been successfully processed and the response was sent back to '${from}'`);
+            } catch (err) {
+                const imageResult = {data: [{ Image: `${__dirname}/sample_output_image.png` }]};
+                const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
+
+                await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
+
+                console.log(`img_gen_request has been failed to process and the mock data was sent back to '${from}'. Printing out error stack below`);
+                console.log(err);
+            }
+        })
+
+        console.log("Subscribed to img_gen_query");
         
+        await node.start()
+
         await node.pubsub.subscribe("TEST", (msg) => {
             console.log(`Received message on TEST: ${msg.data.toString()}`);
         });
         console.log("Subscribed to TEST");
 
-        node.pubsub.on(myPeerId, async (msg) => {
-            const { imgInput, from, queryId, type } = msg;
-
-            console.log(`Received an image generation request: ${JSON.stringify(msg)}`);
-    
-            if (type == 'img_gen_query') {
-                try {
-                    const imageResult = await imageGeneration(imgInput);
-                    const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
-
-                    await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
-
-                    console.log(`${type} (Query ID: '${queryId}') has been successfully processed and the response was sent back to '${from}'`);
-                } catch (err) {
-                    const imageResult = {data: [{ Image: `${__dirname}/sample_output_image.png` }]};
-                    const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
-
-                    await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
-
-                    console.log(`${type} (Query ID: '${queryId}') has been failed to process and the mock data was sent back to '${from}'. Printing out error stack below`);
-                    console.log(err);
-                }
-            }
-        })
-
-        console.log("Subscribed to image_generation");
+        await node.pubsub.subscribe('img_gen_query')
     } catch (err) {
         console.log(err)
     }
