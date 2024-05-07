@@ -97,7 +97,7 @@ $(function () {
         for (var i in imgItems) {
             var item = imgItems[i];
             items.push(`<tr id ="` + item._id + `">
-                                <td><img src="` + item.Image + `" width="100" height="100"></td>
+                                <td><img src=data:image/png;base64,` + item.Image + ` width="100" height="100"></td>
                             </tr>`);
         }
         $('#imgResult').html(items.join(''));
