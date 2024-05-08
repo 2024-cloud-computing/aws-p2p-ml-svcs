@@ -108,10 +108,10 @@ The following diagram from TreasureBox illustrates how the request and response 
     type: "img_gen_response"
     data: [
         {
-            Image: <imgUrl>
+            Image: <base64-img-encode>
         },
         {
-            Image: <imgUrl>
+            Image: <base64-img-encode>
         },
         ...
     ]

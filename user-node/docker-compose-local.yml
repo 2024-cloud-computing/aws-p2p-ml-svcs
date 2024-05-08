@@ -16,6 +16,7 @@ services:
     build: ./p2p
     environment:
       RELAY_URL: ${RELAY_URL}
+      TESTING: ${TESTING}
     network_mode: "host"
     depends_on:
       - browser
