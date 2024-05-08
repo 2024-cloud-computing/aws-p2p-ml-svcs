@@ -8,8 +8,8 @@ const { LEPTON_API_TOKEN } = process.env;
 
 async function imageGeneration(imageDescription) {
   const data = JSON.stringify({
-    width: 512,
-    height: 512,
+    width: 128,
+    height: 128,
     guidance_scale: 5,
     high_noise_frac: 0.75,
     seed: 151886915,
