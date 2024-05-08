@@ -38,7 +38,9 @@ async function imageGeneration(imageDescription) {
       res.pipe(file);
 
       res.on('end', function() {
-        resolve({data: [{ Image: filePath }]})
+        const buffer = fs.readFileSync(filePath);
+        let base64String = Buffer.from(buffer).toString('base64');
+        resolve({data: [{ Image: base64String }]})
       })
     });
 
@@ -52,4 +54,6 @@ async function imageGeneration(imageDescription) {
   })
 }
 
-module.exports = imageGeneration;
+// module.exports = imageGeneration;
+
+imageGeneration('Santa Claus at NYU')
