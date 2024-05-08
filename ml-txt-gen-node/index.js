@@ -5,9 +5,65 @@ const MPLEX = require('libp2p-mplex')
 const { NOISE } = require('libp2p-noise')
 const PubsubPeerDiscovery = require('libp2p-pubsub-peer-discovery')
 const TCP = require('libp2p-tcp')
+const uint8ArrayFromString = require('uint8arrays/from-string')
+const uint8ArrayToString = require('uint8arrays/to-string')
 
 const config = require('./config.json')
 const bootstrapMultiaddrs = config['bootstrapMultiaddrs']
+const axios = require('axios');
+
+
+// Global variables
+var node;
+var myPeerId;
+
+// Helper functions
+function P2PmessageToObject(message) {
+  return JSON.parse(uint8ArrayToString(message.data))
+}
+
+function ObjectToP2Pmessage(message) {
+  return uint8ArrayFromString(JSON.stringify(message));
+}
+
+async function analyzedText(messageText) {
+    const restEndpoint = process.env.REST_ENDPOINT;
+    const apiKey = process.env.API_KEY;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+    };
+
+    const data = {
+        "inputs": messageText
+    };
+
+    try {
+        const response = await axios.post(restEndpoint, data, { headers: headers });
+        // Create a new response object within an array
+        let responseData = [{
+            Input: messageText,
+            Label: response.data.label,
+            Score: response.data.score
+        }];
+        return JSON.stringify({data: responseData});
+    } catch (error) {
+        console.error("Error in analyzedText:", error.message);
+        if (error.response === undefined || error.response.status >= 500) {
+            return JSON.stringify([{
+                    Input: messageText,
+                    Label: "Neutral",
+                    Score: 0.5
+                }]
+            );
+        }
+        return "Error processing your request";
+    }
+}
+
+
+
 
 async function createPeerNode() {
     const node = await Libp2p.create({
@@ -55,12 +111,46 @@ async function startPeerNode() {
             console.log(`Peer ${myPeerId}, Disconnected: ${connection.remotePeer.toB58String()}`);
         })
 
+        // listeners
+        node.pubsub.on('txt_gen_query', (msg) => {
+            console.log('message title: txt_gen_query')
+            const queryMessageBody = P2PmessageToObject(msg);
+            console.log(queryMessageBody);
+            const responseMessageBody = {
+              type: 'txt_gen_query_hit',
+              queryId: queryMessageBody['queryId'],
+              from: myPeerId,
+              txtInput: queryMessageBody['txtInput']
+            }
+            node.pubsub.publish(queryMessageBody['from'], ObjectToP2Pmessage(responseMessageBody))
+        })
+
+        node.pubsub.on(myPeerId, async (msg) => { // Mark this function as async
+            console.log('message title: my peer id')
+            const messageBody = P2PmessageToObject(msg);
+            console.log(messageBody);
+            const analyzedTextResult = await analyzedText(messageBody['txtInput']); 
+            const responseMessageBody = {
+                type: 'txt_gen_response',
+                queryId: messageBody['queryId'],
+                from: myPeerId,
+                data: analyzedTextResult
+            }
+        
+            console.log(`data being sent back is ${responseMessageBody['data']}`);
+            node.pubsub.publish(messageBody['from'], ObjectToP2Pmessage(responseMessageBody));
+            console.log(`Sentiment of the text sent back to ${messageBody['from']}`);
+        });
+        
         await node.start()
         
         await node.pubsub.subscribe("TEST", (msg) => {
             console.log(`Received message on TEST: ${msg.data.toString()}`);
         });
         console.log("Subscribed to TEST");
+
+        await node.pubsub.subscribe('txt_gen_query')
+        await node.pubsub.subscribe(myPeerId)
 
     } catch (e) {
         console.log(e)
