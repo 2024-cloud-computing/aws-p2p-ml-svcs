@@ -27,8 +27,8 @@ function ObjectToP2Pmessage(message) {
 }
 
 async function analyzedText(messageText) {
-    const restEndpoint = "https://ccproject-noqeg.eastus2.inference.ml.azure.com/score";
-    const apiKey = "RqSaTbUiFNcfn5ftUph8izvjscNAo6Pr"; // Replace with your actual API key
+    const restEndpoint = process.env.REST_ENDPOINT;
+    const apiKey = process.env.API_KEY;
 
     const headers = {
         'Content-Type': 'application/json',
@@ -41,15 +41,27 @@ async function analyzedText(messageText) {
 
     try {
         const response = await axios.post(restEndpoint, data, { headers: headers });
-        return JSON.stringify(response.data);
+        // Create a new response object with input first
+        let responseData = {
+            Input: messageText,
+            Label: response.data.label,
+            Score: response.data.score
+        };
+        return JSON.stringify(responseData);
     } catch (error) {
-        console.error("Error in summarizeText:", error.message);
+        console.error("Error in analyzedText:", error.message);
         if (error.response === undefined || error.response.status >= 500) {
-            return JSON.stringify({"label": "Neutral", "score": 0.5});
+            return JSON.stringify({
+                Input: messageText,
+                Label: "Neutral",
+                Score: 0.5
+            });
         }
         return "Error processing your request";
     }
 }
+
+
 
 async function createPeerNode() {
     const node = await Libp2p.create({
