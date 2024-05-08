@@ -8,8 +8,8 @@ const { LEPTON_API_TOKEN } = process.env;
 
 async function imageGeneration(imageDescription) {
   const data = JSON.stringify({
-    width: 1024,
-    height: 1024,
+    width: 512,
+    height: 512,
     guidance_scale: 5,
     high_noise_frac: 0.75,
     seed: 151886915,
@@ -54,6 +54,4 @@ async function imageGeneration(imageDescription) {
   })
 }
 
-// module.exports = imageGeneration;
-
-imageGeneration('Santa Claus at NYU')
+module.exports = imageGeneration;
