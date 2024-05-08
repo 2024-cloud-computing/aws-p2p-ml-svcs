@@ -41,25 +41,27 @@ async function analyzedText(messageText) {
 
     try {
         const response = await axios.post(restEndpoint, data, { headers: headers });
-        // Create a new response object with input first
-        let responseData = {
+        // Create a new response object within an array
+        let responseData = [{
             Input: messageText,
             Label: response.data.label,
             Score: response.data.score
-        };
-        return JSON.stringify(responseData);
+        }];
+        return JSON.stringify({data: responseData});
     } catch (error) {
         console.error("Error in analyzedText:", error.message);
         if (error.response === undefined || error.response.status >= 500) {
-            return JSON.stringify({
-                Input: messageText,
-                Label: "Neutral",
-                Score: 0.5
-            });
+            return JSON.stringify([{
+                    Input: messageText,
+                    Label: "Neutral",
+                    Score: 0.5
+                }]
+            );
         }
         return "Error processing your request";
     }
 }
+
 
 
 
