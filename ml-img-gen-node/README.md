@@ -20,7 +20,7 @@ sudo docker build . -t img-gen-node
 ### Run
 
 ```
-sudo docker run --network=host -e RELAY_URL img-gen-node:latest
+sudo docker run --network=host -e RELAY_URL -e LEPTON_API_TOKEN img-gen-node:latest
 ```
 
 ### Clean up
