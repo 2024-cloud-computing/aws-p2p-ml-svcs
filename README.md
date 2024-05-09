@@ -26,4 +26,4 @@ Go to `user-node` and run the user node locally.
 
 ## Demo
 
-Access the endpoint (not the localhost one) shown in the terminal output after starting user-node.
+Access the endpoint at port 3000 (not the localhost one) shown in the terminal output after starting user-node.
