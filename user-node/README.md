@@ -136,10 +136,10 @@ lastname VARCHAR(200)
 
 ## Deploy
 
-make sure you have the relay server"s address at hand, e.g., `/ip4/127.0.0.1/tcp/2024/p2p/QmQLuEX6ELbNscTSUM5wj4y7Cb1nxJwC46xAkzKSG9zxqj`.
+make sure you have the `RELAY_URL` at hand, e.g., `/ip4/127.0.0.1/tcp/2024/p2p/QmQLuEX6ELbNscTSUM5wj4y7Cb1nxJwC46xAkzKSG9zxqj`.
 
 ```bash
-export RELAY_SERVER=<relay server address>
+export RELAY_URL=<relay server address>
 export TESTING=false # `false` if using service nodes, `true` if using mock data
 ```
 

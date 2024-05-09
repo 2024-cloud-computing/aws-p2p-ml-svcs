@@ -7,8 +7,7 @@ const { NOISE } = require('libp2p-noise')
 const PubsubPeerDiscovery = require('libp2p-pubsub-peer-discovery')
 const TCP = require('libp2p-tcp')
 
-const config = require('./config.json')
-const bootstrapMultiaddrs = config['bootstrapMultiaddrs']
+const bootstrapMultiaddrs = process.env.RELAY_URL ? [process.env.RELAY_URL] : ''
 const uint8ArrayToString = require('uint8arrays/to-string')
 
 // Image generation
@@ -31,16 +30,16 @@ async function createPeerNode() {
             peerDiscovery: [Bootstrap, PubsubPeerDiscovery]
         },
         config: {
-          peerDiscovery: {
-            [PubsubPeerDiscovery.tag]: {
-              interval: 1000,
-              enabled: true
-            },
-            [Bootstrap.tag]: {
-              enabled: true,
-              list: bootstrapMultiaddrs
+            peerDiscovery: {
+                [PubsubPeerDiscovery.tag]: {
+                    interval: 1000,
+                    enabled: true
+                },
+                [Bootstrap.tag]: {
+                    enabled: true,
+                    list: bootstrapMultiaddrs
+                }
             }
-          }
         }
     })
 
@@ -48,7 +47,7 @@ async function createPeerNode() {
 }
 
 async function startPeerNode() {
-    try{
+    try {
         node = await createPeerNode()
         const myPeerId = node.peerId.toB58String()
 
@@ -60,7 +59,7 @@ async function startPeerNode() {
             console.log('message title: img_gen_query')
 
             const { imgInput, from, queryId, type } = P2PmessageToObject(msg);
-    
+
             try {
                 const imageResult = await imageGeneration(imgInput);
                 const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
@@ -69,7 +68,7 @@ async function startPeerNode() {
 
                 console.log(`img_gen_request has been successfully processed and the response was sent back to '${from}'`);
             } catch (err) {
-                const imageResult = {data: [{ Image: `${__dirname}/sample_output_image.png` }]};
+                const imageResult = { data: [{ Image: `${__dirname}/sample_output_image.png` }] };
                 const imageResponse = { ...imageResult, type: "img_gen_response", from, queryId }
 
                 await node.pubsub.publish(from, Buffer.from(JSON.stringify(imageResponse)));
@@ -80,7 +79,7 @@ async function startPeerNode() {
         })
 
         console.log("Subscribed to img_gen_query");
-        
+
         await node.start()
 
         await node.pubsub.subscribe("TEST", (msg) => {

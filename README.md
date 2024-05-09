@@ -3,14 +3,27 @@
 A peer-2-peer platform that provides users with machine learning services such as image generation and text generation.
 
 ## Architecture
+
 ![](assets/diagram.png)
 
-## Setup
+## How to Run
 
-NOTE: This is an initial testing setup
+### 1. relay-server
 
-First run relay-server. Get the peer id of that from the logs.
+Go to `relay-server` and deploy the relay server on AWS EC2 instance. Relay server has to be deployed first so that peers (user and service nodes) can discover each other through it.
 
-Update config.json in ml-txt-gen-node with above peerid. Next run txt-gen-node.
+### 2-1. ml-img–gen-node (powered by Lepton AI)
 
-Update config.json in user-node with above peerid. Next run user-node, this sends a Hello World message to txt-gen-node.
+Go to `ml-img-gen-node` and run the service node locally.
+
+### 2-2. ml-txt-gen-node (powered by Azure ML)
+
+Go to `ml-txt-gen-node` and run the service node locally.
+
+### 3. user-node
+
+Go to `user-node` and run the user node locally.
+
+## Demo
+
+Access the endpoint (not the localhost one) shown in the terminal output after starting user-node.
