@@ -81,10 +81,11 @@ async function startPeerNode() {
             console.log(P2PmessageToObject(msg));
 
             const messageBody = P2PmessageToObject(msg);
-            if (messageBody['type'] == 'txt_gen_query_hit' || messageBody['type'] == 'img_gen_query_hit') {
+            const msgtype = messageBody['type'];
+            if (msgtype == 'txt_gen_query_hit' || msgtype == 'img_gen_query_hit') {
                 handleHit(messageBody);
-            } else if (messageBody['type'] == 'txt_gen_response' || messageBody['type'] == 'img_gen_response') {
-                handleResponse(messageBody);
+            } else if (msgtype == 'txt_gen_response' || msgtype == 'img_gen_response') {
+                handleResponse(messageBody, msgtype);
             }
         })
 
@@ -118,9 +119,11 @@ function handleHit(messageBody) {
     }
 }
 
-function handleResponse(messageBody) {
+function handleResponse(messageBody, type) {
     const queryId = messageBody['queryId'];
-    messageBody.data = JSON.parse(messageBody.data);
+    if (type == "txt_gen_response") {
+        messageBody.data = JSON.parse(messageBody.data);
+    }
     responseMap.set(queryId, messageBody);
 }
 
