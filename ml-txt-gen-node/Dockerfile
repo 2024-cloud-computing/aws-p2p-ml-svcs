@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package.json .
 RUN npm install
 
-COPY index.js config.json /app/
+COPY index.js /app/
 
 EXPOSE 2026
 
