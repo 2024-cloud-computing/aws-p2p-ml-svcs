@@ -8,7 +8,7 @@ export API_KEY=
 export RELAY_URL=<relay server address>
 
 sudo docker build . -t txt-gen-node
-docker run --network=host -e REST_ENDPOINT -e API_KEY txt-gen-node:latest
+docker run --network=host -e REST_ENDPOINT -e API_KEY -e RELAY_URL txt-gen-node:latest
 
 sudo docker image rm -f txt-gen-node
 ```
