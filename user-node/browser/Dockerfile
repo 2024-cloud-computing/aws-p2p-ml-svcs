@@ -8,5 +8,6 @@ RUN pip install -r requirements.txt
 COPY . .
 
 EXPOSE 3000
+ENV PYTHONHASHSEED=0
 
 ENTRYPOINT ["python", "main.py"]
