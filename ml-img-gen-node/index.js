@@ -55,6 +55,14 @@ async function startPeerNode() {
             console.log(`Peer ${myPeerId}, Discovered: ${peerId.toB58String()}`)
         })
 
+        node.connectionManager.on('peer:connect', (connection) => {
+            console.log(`Peer ${myPeerId}, Connected: ${connection.remotePeer.toB58String()}`);
+        })
+
+        node.connectionManager.on('peer:disconnect', (connection) => {
+            console.log(`Peer ${myPeerId}, Disconnected: ${connection.remotePeer.toB58String()}`);
+        })
+
         node.pubsub.on('img_gen_query', async (msg) => {
             console.log('message title: img_gen_query')
 
