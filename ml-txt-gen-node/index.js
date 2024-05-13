@@ -46,7 +46,7 @@ async function analyzedText(messageText) {
             Label: response.data[0].label,
             Score: response.data[0].score
         }];
-        return JSON.stringify({ data: responseData });
+        return JSON.stringify(responseData);
     } catch (error) {
         console.error("Error in analyzedText:", error.message);
         if (error.response === undefined || error.response.status >= 500) {
