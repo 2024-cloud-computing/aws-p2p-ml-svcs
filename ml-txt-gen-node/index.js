@@ -43,8 +43,8 @@ async function analyzedText(messageText) {
         // Create a new response object within an array
         let responseData = [{
             Input: messageText,
-            Label: response.data.label,
-            Score: response.data.score
+            Label: response.data[0].label,
+            Score: response.data[0].score
         }];
         return JSON.stringify({ data: responseData });
     } catch (error) {
